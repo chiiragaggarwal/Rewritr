@@ -73,30 +73,37 @@ module.exports = async function handler(req, res) {
   }
   const safeTone = TONES.includes(tone) ? tone : 'Professional';
 
+  const requestBody = JSON.stringify({
+    contents: [
+      { parts: [{ text: buildPrompt({ mode, platformLabel, tone: safeTone, text: text.trim() }) }] },
+    ],
+    generationConfig: {
+      responseMimeType: 'application/json',
+      temperature: 0.7,
+      maxOutputTokens: 2048,
+    },
+  });
+
   try {
-    const geminiRes = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        contents: [
-          { parts: [{ text: buildPrompt({ mode, platformLabel, tone: safeTone, text: text.trim() }) }] },
-        ],
-        generationConfig: {
-          responseMimeType: 'application/json',
-          temperature: 0.7,
-          maxOutputTokens: 2048,
-        },
-      }),
-    });
+    // Gemini's free tier occasionally returns transient 503/429; retry a couple times.
+    let geminiRes;
+    let lastErrText = '';
+    for (let attempt = 0; attempt < 3; attempt++) {
+      geminiRes = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: requestBody,
+      });
+      if (geminiRes.ok) break;
+      lastErrText = await geminiRes.text();
+      const transient = geminiRes.status === 503 || geminiRes.status === 429;
+      if (!transient || attempt === 2) break;
+      await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
+    }
 
     if (!geminiRes.ok) {
-      const errText = await geminiRes.text();
-      console.error('Gemini error', geminiRes.status, errText);
-      return res.status(502).json({
-        error: 'The rewriting service is temporarily unavailable.',
-        debug_status: geminiRes.status,
-        debug_detail: errText.slice(0, 500),
-      });
+      console.error('Gemini error', geminiRes.status, lastErrText);
+      return res.status(502).json({ error: 'The rewriting service is busy right now. Please try again in a moment.' });
     }
 
     const data = await geminiRes.json();
