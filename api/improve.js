@@ -116,7 +116,11 @@ module.exports = async function handler(req, res) {
 
     if (!geminiRes.ok) {
       console.error('Gemini error', geminiRes.status, lastErrText);
-      return res.status(502).json({ error: 'The rewriting service is busy right now. Please try again in a moment.' });
+      return res.status(502).json({
+        error: 'The rewriting service is busy right now. Please try again in a moment.',
+        debug_status: geminiRes.status,
+        debug_detail: lastErrText.slice(0, 400),
+      });
     }
 
     const data = await geminiRes.json();
