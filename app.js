@@ -280,6 +280,41 @@ function toast(msg) {
 function showError(msg) { els.errorBar.textContent = msg; els.errorBar.hidden = false; }
 function hideError() { els.errorBar.hidden = true; }
 
+/* ---------------- Scroll reveal ---------------- */
+function initReveal() {
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!('IntersectionObserver' in window)) return;
+
+  const targets = document.querySelectorAll(
+    '.section-head, .feature-card, .step, .testi-card, .proof-strip, .faq-item, .cta-card, .stat, .hero-preview'
+  );
+  targets.forEach((el) => el.classList.add('reveal'));
+
+  // stagger siblings within the same group
+  targets.forEach((el) => {
+    let i = 0, s = el;
+    while ((s = s.previousElementSibling)) {
+      if (s.classList && s.classList.contains('reveal')) i++;
+    }
+    el.style.transitionDelay = Math.min(i * 70, 350) + 'ms';
+  });
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+      // clean up so hover transforms etc. work normally afterwards
+      setTimeout(() => {
+        e.target.classList.remove('reveal', 'in');
+        e.target.style.transitionDelay = '';
+      }, 750);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  targets.forEach((el) => io.observe(el));
+}
+
 /* ---------------- Boot ---------------- */
 function boot() {
   renderPlatforms();
@@ -293,6 +328,7 @@ function boot() {
       renderResult(last, false);
     }
   } catch {}
+  initReveal();
 }
 
 boot();
