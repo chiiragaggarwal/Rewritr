@@ -30,19 +30,14 @@ Original text:
 ${text}
 """
 
-Return the rewritten text, an integer 1-10 score for the original, an integer 1-10 score for your rewrite, and a short changelog of what you changed and why it's better.`;
+Respond ONLY with a valid JSON object (no markdown, no code fences) using exactly this shape:
+{
+  "improved": "the rewritten text",
+  "original_score": <integer 1-10 rating the original>,
+  "improved_score": <integer 1-10 rating the rewrite>,
+  "changelog": ["short bullet explaining a change and why it's better", "..."]
+}`;
 }
-
-const RESPONSE_SCHEMA = {
-  type: 'object',
-  properties: {
-    improved: { type: 'string' },
-    original_score: { type: 'integer' },
-    improved_score: { type: 'integer' },
-    changelog: { type: 'array', items: { type: 'string' } },
-  },
-  required: ['improved', 'original_score', 'improved_score', 'changelog'],
-};
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -88,7 +83,6 @@ module.exports = async function handler(req, res) {
         ],
         generationConfig: {
           responseMimeType: 'application/json',
-          responseSchema: RESPONSE_SCHEMA,
           temperature: 0.7,
           maxOutputTokens: 2048,
         },
@@ -98,7 +92,11 @@ module.exports = async function handler(req, res) {
     if (!geminiRes.ok) {
       const errText = await geminiRes.text();
       console.error('Gemini error', geminiRes.status, errText);
-      return res.status(502).json({ error: 'The rewriting service is temporarily unavailable.' });
+      return res.status(502).json({
+        error: 'The rewriting service is temporarily unavailable.',
+        debug_status: geminiRes.status,
+        debug_detail: errText.slice(0, 500),
+      });
     }
 
     const data = await geminiRes.json();
