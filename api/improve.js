@@ -90,7 +90,10 @@ module.exports = async function handler(req, res) {
     generationConfig: {
       responseMimeType: 'application/json',
       temperature: 0.7,
-      maxOutputTokens: 2048,
+      maxOutputTokens: 4096,
+      // gemini-2.5-flash is a "thinking" model; its reasoning consumes the output
+      // budget and can truncate/empty the JSON. Disable thinking for reliable output.
+      thinkingConfig: { thinkingBudget: 0 },
     },
   });
 
@@ -117,12 +120,17 @@ module.exports = async function handler(req, res) {
     }
 
     const data = await geminiRes.json();
-    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const candidate = data?.candidates?.[0];
+    const raw = (candidate?.content?.parts || []).map((p) => p?.text || '').join('');
 
     const parsed = parseJson(raw);
     if (!parsed) {
-      console.error('Parse failure. Raw:', raw.slice(0, 300));
-      return res.status(502).json({ error: 'Could not parse the rewrite. Please try again.' });
+      console.error('Parse failure. finishReason:', candidate?.finishReason, 'Raw:', raw.slice(0, 300));
+      return res.status(502).json({
+        error: 'Could not parse the rewrite. Please try again.',
+        debug_finish: candidate?.finishReason || 'none',
+        debug_rawlen: raw.length,
+      });
     }
 
     const clamp = (n) => {
