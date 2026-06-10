@@ -1,7 +1,7 @@
 // Serverless proxy (Vercel) — holds the Gemini key server-side so users never see it.
 // Set GEMINI_API_KEY in your Vercel project env vars (or .env for `vercel dev`).
 
-const MODEL = 'gemini-2.0-flash';
+const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
 const PLATFORMS = {
