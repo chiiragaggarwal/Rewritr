@@ -39,6 +39,16 @@ Respond ONLY with a valid JSON object (no markdown, no code fences) using exactl
 }`;
 }
 
+// Tolerant JSON parse: handles stray code fences and surrounding prose.
+function parseJson(raw) {
+  if (!raw || typeof raw !== 'string') return null;
+  let s = raw.trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
+  const start = s.indexOf('{');
+  const end = s.lastIndexOf('}');
+  if (start !== -1 && end !== -1) s = s.slice(start, end + 1);
+  try { return JSON.parse(s); } catch { return null; }
+}
+
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -109,10 +119,9 @@ module.exports = async function handler(req, res) {
     const data = await geminiRes.json();
     const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
 
-    let parsed;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
+    const parsed = parseJson(raw);
+    if (!parsed) {
+      console.error('Parse failure. Raw:', raw.slice(0, 300));
       return res.status(502).json({ error: 'Could not parse the rewrite. Please try again.' });
     }
 
