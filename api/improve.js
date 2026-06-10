@@ -101,7 +101,9 @@ module.exports = async function handler(req, res) {
     // Gemini's free tier occasionally returns transient 503/429; retry a couple times.
     let geminiRes;
     let lastErrText = '';
-    for (let attempt = 0; attempt < 3; attempt++) {
+    const MAX_ATTEMPTS = 4;
+    const backoff = [500, 1100, 1900];
+    for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       geminiRes = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -109,18 +111,14 @@ module.exports = async function handler(req, res) {
       });
       if (geminiRes.ok) break;
       lastErrText = await geminiRes.text();
-      const transient = geminiRes.status === 503 || geminiRes.status === 429;
-      if (!transient || attempt === 2) break;
-      await new Promise((r) => setTimeout(r, 600 * (attempt + 1)));
+      const transient = geminiRes.status === 503 || geminiRes.status === 429 || geminiRes.status === 500;
+      if (!transient || attempt === MAX_ATTEMPTS - 1) break;
+      await new Promise((r) => setTimeout(r, backoff[attempt]));
     }
 
     if (!geminiRes.ok) {
       console.error('Gemini error', geminiRes.status, lastErrText);
-      return res.status(502).json({
-        error: 'The rewriting service is busy right now. Please try again in a moment.',
-        debug_status: geminiRes.status,
-        debug_detail: lastErrText.slice(0, 400),
-      });
+      return res.status(502).json({ error: 'The rewriting service is busy right now. Please try again in a moment.' });
     }
 
     const data = await geminiRes.json();
@@ -130,11 +128,7 @@ module.exports = async function handler(req, res) {
     const parsed = parseJson(raw);
     if (!parsed) {
       console.error('Parse failure. finishReason:', candidate?.finishReason, 'Raw:', raw.slice(0, 300));
-      return res.status(502).json({
-        error: 'Could not parse the rewrite. Please try again.',
-        debug_finish: candidate?.finishReason || 'none',
-        debug_rawlen: raw.length,
-      });
+      return res.status(502).json({ error: 'Could not parse the rewrite. Please try again.' });
     }
 
     const clamp = (n) => {
