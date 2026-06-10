@@ -1,0 +1,11 @@
+{
+  "name": "rewritr",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Free AI tool that improves your AI prompts and social media posts.",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "license": "MIT"
+}
