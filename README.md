@@ -58,4 +58,4 @@ vercel dev                # serves the site + /api/improve at http://localhost:3
 To use a different free provider (e.g. Groq), you only need to change `api/improve.js` —
 swap the endpoint, request shape, and the env var. The frontend stays the same.
 
-Model used: `gemini-2.5-flash` (override with the `GEMINI_MODEL` env var).
+Model used: `gemini-2.5-flash-lite` (override with the `GEMINI_MODEL` env var; `gemini-2.5-flash` gives higher quality at lower free limits).
