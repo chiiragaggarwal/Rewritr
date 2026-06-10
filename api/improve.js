@@ -44,7 +44,7 @@ const RESPONSE_SCHEMA = {
   required: ['improved', 'original_score', 'improved_score', 'changelog'],
 };
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Method not allowed' });
