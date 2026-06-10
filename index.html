@@ -3,113 +3,275 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Rewritr — Make every prompt &amp; post hit harder</title>
+  <title>Rewritr — Rewrite AI prompts &amp; social posts that actually perform</title>
+  <meta name="description" content="Rewritr instantly upgrades your AI prompts and social media posts, and shows you exactly what changed and why it's better. Free, no sign-up." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <span class="brand-mark">R</span>
-      <span class="brand-name">Rewritr</span>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="nav-inner">
+      <a href="#top" class="brand">
+        <span class="brand-mark">R</span>
+        <span class="brand-name">Rewritr</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-cta">
+        <span class="free-badge">100% Free</span>
+        <a href="#tool" class="primary-btn small-btn">Try it free</a>
+      </div>
     </div>
-    <span class="free-badge">100% Free</span>
   </header>
 
-  <main class="container">
+  <main id="top">
+    <!-- HERO -->
     <section class="hero">
-      <span class="pill">AI-powered rewriting</span>
-      <h1>Make every <span class="grad">prompt &amp; post</span> hit harder.</h1>
-      <p class="sub">Rewritr sharpens your AI prompts and social posts — then shows you exactly what changed and why it's better.</p>
+      <span class="pill">✨ Free forever · No sign-up required</span>
+      <h1>Rewrite prompts &amp; posts that<br /><span class="grad">actually perform.</span></h1>
+      <p class="sub">Rewritr instantly upgrades your AI prompts and social media posts — then shows you exactly what changed, why it's better, and how much it improved.</p>
+      <div class="hero-cta">
+        <a href="#tool" class="primary-btn big-btn">Improve your text →</a>
+        <a href="#how" class="ghost-btn big-btn">See how it works</a>
+      </div>
+      <p class="trust">No account · Your text stays private · Works with ChatGPT, Claude, Midjourney, LinkedIn, X &amp; Instagram</p>
+
+      <!-- hero preview mock -->
+      <div class="hero-preview">
+        <div class="preview-card before">
+          <span class="tag muted">Before</span>
+          <p>write a linkedin post about my new app</p>
+          <span class="mini-score bad">3/10</span>
+        </div>
+        <div class="preview-arrow">→</div>
+        <div class="preview-card after">
+          <span class="tag grad-tag">After</span>
+          <p>Most builders ship great products — then go quiet. Here's the marketing mistake I see every day, and the 3-step fix 👇</p>
+          <span class="mini-score good">9/10</span>
+        </div>
+      </div>
     </section>
 
-    <section class="glass panel">
-      <!-- Mode -->
-      <div class="control-row">
-        <label class="control-label">Mode</label>
-        <div class="seg" id="modeSeg">
-          <button class="seg-btn active" data-mode="ai">AI Prompt</button>
-          <button class="seg-btn" data-mode="social">Social Media Post</button>
-        </div>
+    <!-- TOOL -->
+    <section id="tool" class="tool-section">
+      <div class="section-head">
+        <span class="eyebrow">Try it now</span>
+        <h2>Paste your text. Get a better version in seconds.</h2>
       </div>
 
-      <!-- Platform -->
-      <div class="control-row">
-        <label class="control-label">Platform</label>
-        <div class="chips" id="platformChips"></div>
-      </div>
-
-      <!-- Tone -->
-      <div class="control-row">
-        <label class="control-label">Tone</label>
-        <div class="chips" id="toneChips"></div>
-      </div>
-
-      <!-- Input -->
-      <div class="control-row col">
-        <label class="control-label" for="inputText">Your text</label>
-        <textarea id="inputText" placeholder="Paste your prompt or post here…"></textarea>
-        <div class="input-foot">
-          <span id="charCount">0 characters</span>
-          <button id="submitBtn" class="primary-btn">
-            <span class="btn-label">Improve it</span>
-            <span class="spinner" hidden></span>
-          </button>
+      <div class="glass panel">
+        <div class="control-row">
+          <label class="control-label">Mode</label>
+          <div class="seg" id="modeSeg">
+            <button class="seg-btn active" data-mode="ai">AI Prompt</button>
+            <button class="seg-btn" data-mode="social">Social Media Post</button>
+          </div>
         </div>
-      </div>
-      <div id="errorBar" class="error-bar" hidden></div>
-    </section>
 
-    <!-- Results -->
-    <section id="results" class="results" hidden>
-      <div class="score-card glass">
-        <div class="score-block">
-          <span class="score-label">Original</span>
-          <div class="score-bar"><div class="score-fill original" id="scoreOrigFill"></div></div>
-          <span class="score-num" id="scoreOrig">–</span>
+        <div class="control-row">
+          <label class="control-label">Platform</label>
+          <div class="chips" id="platformChips"></div>
         </div>
-        <div class="score-arrow">→</div>
-        <div class="score-block">
-          <span class="score-label">Improved</span>
-          <div class="score-bar"><div class="score-fill improved" id="scoreImpFill"></div></div>
-          <span class="score-num" id="scoreImp">–</span>
-        </div>
-      </div>
 
-      <div class="compare">
-        <div class="glass compare-card">
-          <div class="compare-head"><span class="tag muted">Original</span></div>
-          <div class="compare-body" id="origText"></div>
+        <div class="control-row">
+          <label class="control-label">Tone</label>
+          <div class="chips" id="toneChips"></div>
         </div>
-        <div class="glass compare-card highlight">
-          <div class="compare-head">
-            <span class="tag grad-tag">Improved</span>
-            <button id="copyBtn" class="ghost-btn small">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              <span>Copy</span>
+
+        <div class="control-row col">
+          <label class="control-label" for="inputText">Your text</label>
+          <textarea id="inputText" placeholder="Paste your prompt or post here…"></textarea>
+          <div class="input-foot">
+            <span id="charCount">0 characters</span>
+            <button id="submitBtn" class="primary-btn">
+              <span class="btn-label">Improve it</span>
+              <span class="spinner" hidden></span>
             </button>
           </div>
-          <div class="compare-body" id="impText"></div>
+        </div>
+        <div id="errorBar" class="error-bar" hidden></div>
+      </div>
+
+      <section id="results" class="results" hidden>
+        <div class="score-card glass">
+          <div class="score-block">
+            <span class="score-label">Original</span>
+            <div class="score-bar"><div class="score-fill original" id="scoreOrigFill"></div></div>
+            <span class="score-num" id="scoreOrig">–</span>
+          </div>
+          <div class="score-arrow">→</div>
+          <div class="score-block">
+            <span class="score-label">Improved</span>
+            <div class="score-bar"><div class="score-fill improved" id="scoreImpFill"></div></div>
+            <span class="score-num" id="scoreImp">–</span>
+          </div>
+        </div>
+
+        <div class="compare">
+          <div class="glass compare-card">
+            <div class="compare-head"><span class="tag muted">Original</span></div>
+            <div class="compare-body" id="origText"></div>
+          </div>
+          <div class="glass compare-card highlight">
+            <div class="compare-head">
+              <span class="tag grad-tag">Improved</span>
+              <button id="copyBtn" class="ghost-btn small">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy</span>
+              </button>
+            </div>
+            <div class="compare-body" id="impText"></div>
+          </div>
+        </div>
+
+        <div class="glass changelog-card">
+          <h3 class="changelog-title">What changed &amp; why it's better</h3>
+          <ul id="changelog" class="changelog"></ul>
+        </div>
+      </section>
+
+      <section id="historySection" class="history" hidden>
+        <div class="history-head">
+          <h3>Recent improvements</h3>
+          <button id="clearHistory" class="ghost-btn small">Clear</button>
+        </div>
+        <div id="historyList" class="history-list"></div>
+      </section>
+    </section>
+
+    <!-- STATS BAND -->
+    <section class="stats">
+      <div class="stat"><span class="stat-num">2</span><span class="stat-label">Modes</span></div>
+      <div class="stat"><span class="stat-num">6</span><span class="stat-label">Platforms</span></div>
+      <div class="stat"><span class="stat-num">4</span><span class="stat-label">Tones</span></div>
+      <div class="stat"><span class="stat-num">$0</span><span class="stat-label">Forever</span></div>
+    </section>
+
+    <!-- FEATURES -->
+    <section id="features" class="features">
+      <div class="section-head center">
+        <span class="eyebrow">Features</span>
+        <h2>Everything you need to write better, faster</h2>
+        <p class="section-sub">Built for creators, marketers, and anyone who talks to AI all day.</p>
+      </div>
+      <div class="feature-grid">
+        <div class="glass feature-card">
+          <div class="feat-icon">🎯</div>
+          <h3>Two purpose-built modes</h3>
+          <p>Switch between <b>AI Prompt</b> and <b>Social Media Post</b> — each tuned for what makes that format work.</p>
+        </div>
+        <div class="glass feature-card">
+          <div class="feat-icon">🧩</div>
+          <h3>Platform-aware rewrites</h3>
+          <p>Optimized for ChatGPT, Claude, Midjourney, LinkedIn, X and Instagram — not one-size-fits-all.</p>
+        </div>
+        <div class="glass feature-card">
+          <div class="feat-icon">🎭</div>
+          <h3>Pick your tone</h3>
+          <p>Professional, Casual, Viral or Witty. The same idea, dialed to the voice you want.</p>
+        </div>
+        <div class="glass feature-card">
+          <div class="feat-icon">📊</div>
+          <h3>Before / after scoring</h3>
+          <p>See your original vs improved version rated out of 10, so the upgrade is obvious.</p>
+        </div>
+        <div class="glass feature-card">
+          <div class="feat-icon">📝</div>
+          <h3>A clear changelog</h3>
+          <p>Every rewrite explains exactly what changed and why it's better — so you learn as you go.</p>
+        </div>
+        <div class="glass feature-card">
+          <div class="feat-icon">🔒</div>
+          <h3>Free &amp; private</h3>
+          <p>No sign-up, no cost. Your history is saved right in your browser — never on a server.</p>
         </div>
       </div>
+    </section>
 
-      <div class="glass changelog-card">
-        <h3 class="changelog-title">What changed &amp; why it's better</h3>
-        <ul id="changelog" class="changelog"></ul>
+    <!-- HOW IT WORKS -->
+    <section id="how" class="how">
+      <div class="section-head center">
+        <span class="eyebrow">How it works</span>
+        <h2>Three steps to a better version</h2>
+      </div>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">1</span>
+          <h3>Paste &amp; configure</h3>
+          <p>Drop in your prompt or post, then pick the mode, platform and tone.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <h3>Hit Improve</h3>
+          <p>AI rewrites it instantly and rates both versions out of 10.</p>
+        </div>
+        <div class="step">
+          <span class="step-num">3</span>
+          <h3>Copy &amp; ship</h3>
+          <p>Grab the upgraded version with one click and see exactly what changed.</p>
+        </div>
       </div>
     </section>
 
-    <!-- History -->
-    <section id="historySection" class="history" hidden>
-      <div class="history-head">
-        <h3>Recent improvements</h3>
-        <button id="clearHistory" class="ghost-btn small">Clear</button>
+    <!-- FAQ -->
+    <section id="faq" class="faq">
+      <div class="section-head center">
+        <span class="eyebrow">FAQ</span>
+        <h2>Questions, answered</h2>
       </div>
-      <div id="historyList" class="history-list"></div>
+      <div class="faq-list">
+        <details class="glass faq-item">
+          <summary>Is Rewritr really free?</summary>
+          <p>Yes — completely. No account, no credit card, no hidden limits for normal use.</p>
+        </details>
+        <details class="glass faq-item">
+          <summary>Do I need to sign in?</summary>
+          <p>Nope. You can use everything as a guest. Your recent improvements are saved locally in your own browser.</p>
+        </details>
+        <details class="glass faq-item">
+          <summary>Is my text stored anywhere?</summary>
+          <p>Your text is sent to the AI to generate the rewrite, but Rewritr doesn't keep a copy. History lives only in your browser's local storage.</p>
+        </details>
+        <details class="glass faq-item">
+          <summary>Which platforms does it support?</summary>
+          <p>AI mode covers ChatGPT, Claude and Midjourney. Social mode covers LinkedIn, X and Instagram — with more on the way.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="cta-banner">
+      <div class="glass cta-card">
+        <h2>Ready to sound better?</h2>
+        <p>Improve your first prompt or post in seconds — free, no sign-up.</p>
+        <a href="#tool" class="primary-btn big-btn">Improve your text →</a>
+      </div>
     </section>
   </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <a href="#top" class="brand">
+        <span class="brand-mark">R</span>
+        <span class="brand-name">Rewritr</span>
+      </a>
+      <p class="footer-tag">Make every prompt &amp; post hit harder.</p>
+      <nav class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+        <a href="#tool">Try it</a>
+      </nav>
+      <p class="footer-copy">© 2026 Rewritr · Free forever</p>
+    </div>
+  </footer>
 
   <div id="toast" class="toast" hidden></div>
 
