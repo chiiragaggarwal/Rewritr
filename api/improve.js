@@ -101,8 +101,8 @@ module.exports = async function handler(req, res) {
     // Gemini's free tier occasionally returns transient 503/429; retry a couple times.
     let geminiRes;
     let lastErrText = '';
-    const MAX_ATTEMPTS = 4;
-    const backoff = [500, 1100, 1900];
+    const MAX_ATTEMPTS = 3;
+    const backoff = [600, 1400];
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
       geminiRes = await fetch(`${GEMINI_URL}?key=${apiKey}`, {
         method: 'POST',
@@ -111,17 +111,20 @@ module.exports = async function handler(req, res) {
       });
       if (geminiRes.ok) break;
       lastErrText = await geminiRes.text();
-      const transient = geminiRes.status === 503 || geminiRes.status === 429 || geminiRes.status === 500;
+      // Only retry genuine transient server errors. Do NOT retry 429 (quota) —
+      // retrying just burns more of the rate limit and can't succeed anyway.
+      const transient = geminiRes.status === 503 || geminiRes.status === 500;
       if (!transient || attempt === MAX_ATTEMPTS - 1) break;
       await new Promise((r) => setTimeout(r, backoff[attempt]));
     }
 
     if (!geminiRes.ok) {
       console.error('Gemini error', geminiRes.status, lastErrText);
-      return res.status(502).json({
-        error: 'The rewriting service is busy right now. Please try again in a moment.',
-        debug_status: geminiRes.status,
-        debug_detail: lastErrText.slice(0, 350),
+      const quota = geminiRes.status === 429;
+      return res.status(quota ? 429 : 502).json({
+        error: quota
+          ? "We've hit the free usage limit for the moment. Please try again in a minute."
+          : 'The rewriting service is busy right now. Please try again in a moment.',
       });
     }
 
